@@ -1,26 +1,39 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import firebase from 'firebase'
+import config from './config'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends React.Component {
+
+  constructor(){
+    super()
+    firebase.initializeApp(config)
+    this.state = {
+      loading: true
+    }
+  }
+
+  componentWillMount(){
+    const ref = firebase.database().ref('personnage')
+    ref.on('value', snapshot => {
+      console.log('ok')
+      this.setState({
+        presonnage: snapshot.val(),
+        loading: false
+      })
+    })
+  }
+
+  render(){
+    if(this.state.loading){
+      return <h1>Chargement</h1>
+    }
+    
+    const persos = this.state.personnage.map((perso, i) => <h2 key={i}>{perso.nom}</h2>)
+    return (
+      <div>
+        <h1>Persos</h1>
+        {persos}
+      </div>
+    );
+  }
 }
-
-export default App;
